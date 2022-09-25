@@ -23,13 +23,12 @@ mongoose.Promise = global.Promise;
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
-
-var items = []
 var categorys = []
+var items = []
 
 
 
-function categoryCreate(name, description, link) {
+function categoryCreate(name, description, link, cb) {
   categorydetail = {
     name: name,
     description: description,
@@ -38,10 +37,11 @@ function categoryCreate(name, description, link) {
   var category = new Category(categorydetail)
   category.save(function (err) {
     if(err) {
-      return
+      return;
     }
     console.log('New Category:' + category);
     categorys.push(category)
+    cb(null, category)
   })
 
 
@@ -72,46 +72,48 @@ function itemCreate(name, description, category, price, stock, link) {
   });
 }
 
-function createItems(cb) {
-  async.series([
-    function(callback) {
-      itemCreate("Pikachu", "Friendly Pikachu Plushie", categorys[0], 39.99, 42, "https://www.pokemoncenter.com/products/images/P7730/701-29237/P7730_701-29237_01_full.jpg")
-    },
-    function(callback) {
-      itemCreate("Piplup", "Squishy Penguin Friend", categorys[1], 22.79, 8, "https://www.pokemoncenter.com/products/images/P8020/701-29490/P8020_701-29490_01_full.jpg")
-    },
-    function(callback) {
-      itemCreate("Snorlax", "He loves to eat everything", categorys[2], 44.99, 2, "https://target.scene7.com/is/image/Target/GUEST_faefc03d-8494-49f5-a12b-3705a9a248b8?wid=800&hei=800&qlt=80&fmt=pjpeg")
-    },
-
-
-  ])
-}
-
 function createCategorys(cb) {
   async.series([
     function(callback) {
-      categoryCreate("Electric Type", "Features only Electric pokémon", "/Pikachu")
+      categoryCreate("Electric Type", "Features only Electric pokémon", "/Pikachu", callback);
     },
     function(callback) {
-      categoryCreate("Water/Ice Type", "Features combination water types", "/Piplup")
+      categoryCreate("Water/Ice Type", "Features combination water types", "/Piplup", callback);
     },
     function(callback) {
-      categoryCreate("Normal Type", "Features normal type pokémon", "/Snorlax")
-    }
+      categoryCreate("Normal Type", "Features normal type pokémon", "/Snorlax", callback);
+    },
 
 
 
-  ])
+  ], cb)
 }
+
+function createItems(cb) {
+  async.parallel([
+    function(callback) {
+      itemCreate("Pikachu", "Friendly Pikachu Plushie", categorys[0], 39.99, 42, "https://www.pokemoncenter.com/products/images/P7730/701-29237/P7730_701-29237_01_full.jpg", callback)
+    },
+    function(callback) {
+      itemCreate("Piplup", "Squishy Penguin Friend", categorys[1], 22.79, 8, "https://www.pokemoncenter.com/products/images/P8020/701-29490/P8020_701-29490_01_full.jpg", callback)
+    },
+    function(callback) {
+      itemCreate("Snorlax", "He loves to eat everything", categorys[2], 44.99, 2, "https://target.scene7.com/is/image/Target/GUEST_faefc03d-8494-49f5-a12b-3705a9a248b8?wid=800&hei=800&qlt=80&fmt=pjpeg", callback)
+    },
+
+
+  ], cb)
+}
+
+
 
 
 
 
 
 async.series([
-  createItems,
-  createCategorys
+  createCategorys,
+  createItems
 ],
 // Optional callback
 function(err, results) {

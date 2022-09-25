@@ -1,0 +1,16 @@
+extends layout
+block content
+  h1= title
+  
+  ul(class='itemlist')
+    each val in list_items
+      li(class='card') 
+        a(href=val.url) #{val.name}
+        p #{val.description}
+        p #{val.price}
+        p #{val.stock} left in stock
+        img(src=val.link)
+      
+
+    else
+      li There are no genre.

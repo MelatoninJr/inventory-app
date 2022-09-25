@@ -4,14 +4,12 @@ const Schema = mongoose.Schema
 
 const CategorySchema = new Schema({
     name: { type: String, required: true, minLength: 3},
-    description: { type: String, required: true, minLength: 3},
-    link: { type: String, required: true}
-
+    description: { type: String, required: true, minLength: 3}
 })
 
 
 CategorySchema.virtual("url").get(function () {
-    return `/shop/category/` + this._id;
+    return `/shop/category/` /*+ this._id;*/
 })
 
 module.exports = mongoose.model("Category", CategorySchema)

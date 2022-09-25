@@ -4,7 +4,7 @@ const Schema = mongoose.Schema
 
 const ItemSchema = new Schema({
     name: { type: String, required: true, minLength: 3},
-    description: { type: String, required: true, minLength: 12},
+    description: { type: String, required: true, minLength: 3},
     category: { type: Schema.Types.ObjectId, ref: "Category" },
     price: { type: Number, required: true},
     stock: { type: Number, required: true},
@@ -14,7 +14,7 @@ const ItemSchema = new Schema({
 
 
 ItemSchema.virtual("url").get(function () {
-    return `/shop/item/${this._id}`
+    return `/shop/items/` + this._id;
 })
 
 module.exports = mongoose.model("Item", ItemSchema)
